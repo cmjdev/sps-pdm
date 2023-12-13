@@ -1,0 +1,34 @@
+[
+    {
+        "fuse_min": 0,
+        "fuse_max": 25,
+        "fuse_inrush": 50,
+        "fuse_delay": 2000,
+        "soft_start": 1000,
+        "pwm_mode": 0
+    },
+    {
+        "fuse_min": 0,
+        "fuse_max": 25,
+        "fuse_inrush": 50,
+        "fuse_delay": 2000,
+        "soft_start": 1000,
+        "pwm_mode": 0
+    },
+    {
+        "fuse_min": 0,
+        "fuse_max": 25,
+        "fuse_inrush": 50,
+        "fuse_delay": 2000,
+        "soft_start": 1000,
+        "pwm_mode": 0
+    },
+    {
+        "fuse_min": 0,
+        "fuse_max": 25,
+        "fuse_inrush": 50,
+        "fuse_delay": 2000,
+        "soft_start": 1000,
+        "pwm_mode": 0
+    }
+]
