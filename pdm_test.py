@@ -1,5 +1,6 @@
 import json
 import time
+import asyncio
 from channel import Channel
 
 with open("config.json") as f:
@@ -42,27 +43,51 @@ def set_mask(channel, value, offset, mask):
         message[ci[channel][0]] = message[ci[channel][0]] | value << ci[channel][offset]
 
 
-def send_feedback():
-    base = BASE_ID
-    for i, c in enumerate(channel):
-        ch = i % 4
+def process_config(msg):
+    pass  # channel[msg.id - base_id + 8].set_config(msg.payload)
 
-        # set current
-        message[ch] = int(c.current / 50)
+def process_command(id, msg): # TODO: CHANGE THIS TO USE MSG.ID FOR PROD.
 
-        # set shutdown
-        set_mask(ch, c.shutdown, SHUTDOWN_OFFSET, SHUTDOWN_MASK)
+    to_command = id - BASE_ID - 4
 
-        # set s1tatus
-        set_mask(ch, c.status, STATUS_OFFSET, STATUS_MASK)
+    i = j = 0
+    while i < 8:
+        channel[to_command + j].set_command(msg[i:i+2])
+        i += 2
+        j += 1
 
-        # set active
-        set_mask(ch, c.active, ACTIVE_OFFSET, ACTIVE_MASK)
+async def send_feedback():
+    while True:
+        base = BASE_ID
+        for i, c in enumerate(channel):
+            ch = i % 4
 
-        if ch == 3:
-            print(hex(base), message)
-            base = base + 1
+            # set current
+            message[ch] = int(c.current / 50)
 
+            # set shutdown
+            set_mask(ch, c.shutdown, SHUTDOWN_OFFSET, SHUTDOWN_MASK)
+
+            # set s1tatus
+            set_mask(ch, c.status, STATUS_OFFSET, STATUS_MASK)
+
+            # set active
+            set_mask(ch, c.active, ACTIVE_OFFSET, ACTIVE_MASK)
+
+            if ch == 3:
+                print(hex(base), message)
+                base = base + 1
+        await asyncio.sleep(0.1)
+
+async def boop():
+    while True:
+        print("BOOP")
+        await asyncio.sleep(1)
+
+async def main():
+    feedback_task = asyncio.create_task(send_feedback())
+
+    await asyncio.gather(feedback_task)
 
 channel = [
     Channel(
@@ -77,33 +102,4 @@ channel = [
     for i in range(4)
 ]
 
-
-# SET UP FEEDBACK MESSAGE 20Hz?
-
-
-def process_config(msg):
-    pass  # channel[msg.id - base_id + 8].set_config(msg.payload)
-
-def process_command(id, msg): # TODO: CHANGE THIS TO USE MSG.ID FOR PROD.
-
-    to_command = id - BASE_ID - 4
-
-    i = j = 0
-    while i < 8:
-        channel[to_command + j].set_command(msg[i:i+2])
-        i += 2
-        j += 1
-
-
-# MAIN LOOP HERE
-
-# feedback_tick = time.monotonic_ns() * 1E-6
-
-# while True:
-#     elapsed_time = time.monotonic_ns() * 1E-6 - feedback_tick
-#     if elapsed_time >= 100:
-#         print(elapsed_time)
-#         send_feedback()
-#         feedback_tick = time.monotonic_ns() * 1E-6
-
-# READ AND PROCESS CANBUS MESSAGES HERE
+asyncio.run(main())
