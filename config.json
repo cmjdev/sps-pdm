@@ -1,34 +1,38 @@
 [
     {
         "fuse_min": 0,
-        "fuse_max": 25,
-        "fuse_inrush": 50,
+        "fuse_max": 2550,
+        "fuse_inrush": 5000,
         "fuse_delay": 2000,
         "soft_start": 1000,
+        "retry_delay": 200,
         "pwm_mode": 0
     },
     {
         "fuse_min": 0,
-        "fuse_max": 25,
-        "fuse_inrush": 50,
+        "fuse_max": 2550,
+        "fuse_inrush": 5000,
         "fuse_delay": 2000,
         "soft_start": 1000,
+        "retry_delay": 200,
         "pwm_mode": 0
     },
     {
         "fuse_min": 0,
-        "fuse_max": 25,
-        "fuse_inrush": 50,
+        "fuse_max": 2550,
+        "fuse_inrush": 5000,
         "fuse_delay": 2000,
         "soft_start": 1000,
+        "retry_delay": 200,
         "pwm_mode": 0
     },
     {
         "fuse_min": 0,
-        "fuse_max": 25,
-        "fuse_inrush": 50,
+        "fuse_max": 2550,
+        "fuse_inrush": 5000,
         "fuse_delay": 2000,
         "soft_start": 1000,
+        "retry_delay": 200,
         "pwm_mode": 0
     }
 ]
