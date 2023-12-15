@@ -1,5 +1,4 @@
 import json
-import time
 import asyncio
 from channel import Channel
 
@@ -75,19 +74,20 @@ async def send_feedback():
             set_mask(ch, c.active, ACTIVE_OFFSET, ACTIVE_MASK)
 
             if ch == 3:
-                print(hex(base), message)
+                print(hex(base), message, "SEND CANBUS MESSAGE HERE, CHANGE TIMING TO SUIT")
                 base = base + 1
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(5)
 
-async def boop():
+async def process_channels():
     while True:
-        print("BOOP")
+        print("PROCESS CHANNELS HERE, CHANGE TIMING TO SUIT")
         await asyncio.sleep(1)
 
 async def main():
     feedback_task = asyncio.create_task(send_feedback())
+    process_task = asyncio.create_task(process_channels())
 
-    await asyncio.gather(feedback_task)
+    await asyncio.gather(feedback_task, feedback_task)
 
 channel = [
     Channel(
