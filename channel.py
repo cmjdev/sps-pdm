@@ -1,3 +1,5 @@
+import asyncio
+
 class Channel:
     def __init__(
         self,
@@ -28,8 +30,15 @@ class Channel:
         self.retry_delay = retry_delay
         self.pwm_mode = pwm_mode
 
-    def process():
-        pass
+    async def intake(self):
+        while True:
+            print("Getting current")
+            await asyncio.sleep(1)
+
+    async def process(self):
+        while True:
+            print("Processing Channel")
+            await asyncio.sleep(1)
 
     def set_command(self, msg): # takes byte with combined duty/frequency/reset
         # set duty / freq

@@ -84,10 +84,12 @@ async def process_channels():
         await asyncio.sleep(1)
 
 async def main():
-    feedback_task = asyncio.create_task(send_feedback())
-    process_task = asyncio.create_task(process_channels())
-
-    await asyncio.gather(feedback_task, feedback_task)
+    tasks = []
+    tasks.append(asyncio.create_task(send_feedback()))
+    for ch in channel:
+        tasks.append(asyncio.create_task(ch.intake()))
+        tasks.append(asyncio.create_task(ch.process()))
+    await asyncio.gather(*tasks)
 
 channel = [
     Channel(
