@@ -78,11 +78,6 @@ async def send_feedback():
                 base = base + 1
         await asyncio.sleep(5)
 
-async def process_channels():
-    while True:
-        print("PROCESS CHANNELS HERE, CHANGE TIMING TO SUIT")
-        await asyncio.sleep(1)
-
 async def main():
     tasks = []
     tasks.append(asyncio.create_task(send_feedback()))
