@@ -6,7 +6,8 @@
         "fuse_delay": 2000,
         "soft_start": 1000,
         "retry_delay": 200,
-        "pwm_mode": 0
+        "pwm_mode": 0,
+        "pin": "A0"
     },
     {
         "fuse_min": 0,
@@ -15,7 +16,8 @@
         "fuse_delay": 2000,
         "soft_start": 1000,
         "retry_delay": 200,
-        "pwm_mode": 0
+        "pwm_mode": 0,
+        "pin": "A1"
     },
     {
         "fuse_min": 0,
@@ -24,7 +26,8 @@
         "fuse_delay": 2000,
         "soft_start": 1000,
         "retry_delay": 200,
-        "pwm_mode": 0
+        "pwm_mode": 0,
+        "pin": "A2"
     },
     {
         "fuse_min": 0,
@@ -33,6 +36,7 @@
         "fuse_delay": 2000,
         "soft_start": 1000,
         "retry_delay": 200,
-        "pwm_mode": 0
+        "pwm_mode": 0,
+        "pin": "A3"
     }
 ]

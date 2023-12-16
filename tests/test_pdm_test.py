@@ -23,6 +23,3 @@ def test_command():
         assert channel[j].duty == expected_results[i]
         assert channel[j].freq == expected_results[i+1]
         j += 1
-
-def test_two():
-    pass

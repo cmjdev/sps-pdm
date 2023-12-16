@@ -49,11 +49,17 @@ def process_command(id, msg): # TODO: CHANGE THIS TO USE MSG.ID FOR PROD.
 
     to_command = id - BASE_ID - 4
 
-    i = j = 0
-    while i < 8:
+    j = 0
+    for i in range(0,8,2):
         channel[to_command + j].set_command(msg[i:i+2])
         i += 2
         j += 1
+
+    # i = j = 0
+    # while i < 8:
+    #     channel[to_command + j].set_command(msg[i:i+2])
+    #     i += 2
+    #     j += 1
 
 async def send_feedback():
     while True:
@@ -82,21 +88,11 @@ async def main():
     tasks = []
     tasks.append(asyncio.create_task(send_feedback()))
     for ch in channel:
-        tasks.append(asyncio.create_task(ch.intake()))
         tasks.append(asyncio.create_task(ch.process()))
     await asyncio.gather(*tasks)
 
-channel = [
-    Channel(
-        fuse_min=config[i]["fuse_min"],
-        fuse_max=config[i]["fuse_max"],
-        fuse_inrush=config[i]["fuse_inrush"],
-        fuse_delay=config[i]["fuse_delay"],
-        soft_start=config[i]["soft_start"],
-        retry_delay=config[i]["retry_delay"],
-        pwm_mode=config[i]["pwm_mode"],
-    )
-    for i in range(4)
-]
 
-asyncio.run(main())
+# Create all channels according to config
+channel = [Channel(**c) for c in config]
+
+# asyncio.run(main())

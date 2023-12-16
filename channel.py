@@ -1,4 +1,10 @@
 import asyncio
+import sys
+
+if sys.implementation.name == "circuitpython":
+    import microcontroller
+    import analogio
+    import board
 
 class Channel:
     def __init__(
@@ -10,6 +16,7 @@ class Channel:
         soft_start,
         retry_delay,
         pwm_mode,
+        pin
     ):
         # Feedback
         self.current = 0
@@ -29,15 +36,17 @@ class Channel:
         self.soft_start = soft_start
         self.retry_delay = retry_delay
         self.pwm_mode = pwm_mode
+        self.pin = getattr(board, pin)
 
-    async def intake(self):
-        while True:
-            print("Getting current")
-            await asyncio.sleep(1)
+        if sys.implementation.name == "circuitpython":
+            self.pin = analogio.AnalogIn(self.pin)
 
     async def process(self):
         while True:
-            print("Processing Channel")
+            if sys.implementation.name == "circuitpython":
+                self.current = self.pin.value
+                print(self.current)
+            else: print("Process Inputs Here")
             await asyncio.sleep(1)
 
     def set_command(self, msg): # takes byte with combined duty/frequency/reset
