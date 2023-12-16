@@ -95,4 +95,4 @@ async def main():
 # Create all channels according to config
 channel = [Channel(**c) for c in config]
 
-# asyncio.run(main())
+asyncio.run(main())

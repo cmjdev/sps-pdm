@@ -4,6 +4,7 @@ import sys
 if sys.implementation.name == "circuitpython":
     import microcontroller
     import analogio
+    import digitalio
     import board
 
 class Channel:
@@ -16,7 +17,8 @@ class Channel:
         soft_start,
         retry_delay,
         pwm_mode,
-        pin
+        input_pin,
+        output_pin,
     ):
         # Feedback
         self.current = 0
@@ -36,15 +38,22 @@ class Channel:
         self.soft_start = soft_start
         self.retry_delay = retry_delay
         self.pwm_mode = pwm_mode
-        self.pin = getattr(board, pin)
+        self.input_pin = getattr(board, input_pin)
+        self.output_pin = getattr(board, output_pin)
 
         if sys.implementation.name == "circuitpython":
-            self.pin = analogio.AnalogIn(self.pin)
+            self.input_pin = analogio.AnalogIn(self.input_pin)
+            self.output_pin = digitalio.DigitalInOut(self.output_pin)
+            self.output_pin.direction = digitalio.Direction.OUTPUT
 
     async def process(self):
         while True:
             if sys.implementation.name == "circuitpython":
-                self.current = self.pin.value
+                self.current = self.input_pin.value
+                
+                if self.current < 100: self.output_pin.value = True
+                else: self.output_pin.value = False
+
                 print(self.current)
             else: print("Process Inputs Here")
             await asyncio.sleep(1)
