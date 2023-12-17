@@ -1,6 +1,19 @@
 import json
 import asyncio
+import sys
 from channel import Channel
+
+if sys.implementation.name == "circuitpython":
+    import board
+    import busio
+    from digitalio import DigitalInOut
+    from adafruit_mcp2515.canio import Message
+    from adafruit_mcp2515 import MCP2515 as CAN
+
+    cs = DigitalInOut(board.CAN_CS)
+    cs.switch_to_output()
+    spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
+    can_bus = CAN(spi, cs)
 
 with open("config.json") as f:
     config = json.load(f)
@@ -80,9 +93,13 @@ async def send_feedback():
             set_mask(ch, c.active, ACTIVE_OFFSET, ACTIVE_MASK)
 
             if ch == 3:
-                print(hex(base), message, "SEND CANBUS MESSAGE HERE, CHANGE TIMING TO SUIT")
+                if sys.implementation.name == "circuitpython":
+                    msg = Message(BASE_ID, message)
+                    can_bus.send(msg)
+                else:
+                    print(hex(base), message, "SEND CANBUS MESSAGE HERE, CHANGE TIMING TO SUIT")
                 base = base + 1
-        await asyncio.sleep(5)
+        await asyncio.sleep(.1)
 
 async def main():
     tasks = []

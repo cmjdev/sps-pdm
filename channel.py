@@ -47,16 +47,28 @@ class Channel:
             self.output_pin.direction = digitalio.Direction.OUTPUT
 
     async def process(self):
-        while True:
-            if sys.implementation.name == "circuitpython":
-                self.current = self.input_pin.value
-                
-                if self.current < 100: self.output_pin.value = True
-                else: self.output_pin.value = False
 
-                print(self.current)
-            else: print("Process Inputs Here")
-            await asyncio.sleep(1)
+        while True:
+
+            if sys.implementation.name == "circuitpython":
+                
+                self.current = self.input_pin.value / 5.46
+
+                # SHUTDOWN IF OVER CURRENT
+                if self.current > self.fuse_max:
+                    self.shutdown = True
+
+
+                if self.shutdown or not self.duty:
+                    self.output_pin.value = False
+                elif self.duty:
+                    self.output_pin.value = True
+                
+                await asyncio.sleep(0.1)
+
+            else: 
+                print("Process Inputs Here")
+                await asyncio.sleep(1)
 
     def set_command(self, msg): # takes byte with combined duty/frequency/reset
         # set duty / freq
