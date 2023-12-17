@@ -55,24 +55,23 @@ def set_mask(channel, value, offset, mask):
         message[ci[channel][0]] = message[ci[channel][0]] | value << ci[channel][offset]
 
 
-def process_config(msg):
-    pass  # channel[msg.id - base_id + 8].set_config(msg.payload)
+def process_config(id, msg):
+    to_command = id - BASE_ID - 8
 
-def process_command(id, msg): # TODO: CHANGE THIS TO USE MSG.ID FOR PROD.
+    channel[to_command].set_config(msg)
 
+    print(f"set channel {to_command} to {msg}")
+    print(channel[0].fuse_max)
+
+
+def process_command(id, msg):  # TODO: CHANGE THIS TO USE MSG.ID FOR PROD.
     to_command = id - BASE_ID - 4
 
     j = 0
-    for i in range(0,8,2):
-        channel[to_command + j].set_command(msg[i:i+2])
-        i += 2
+    for i in range(0, 8, 2):
+        channel[to_command + j].set_command(msg[i : i + 2])
         j += 1
 
-    # i = j = 0
-    # while i < 8:
-    #     channel[to_command + j].set_command(msg[i:i+2])
-    #     i += 2
-    #     j += 1
 
 async def send_feedback():
     while True:
@@ -82,7 +81,7 @@ async def send_feedback():
 
             # set current
             message[ch] = int(c.current / 50)
-
+            # print(c.current)
             # set shutdown
             set_mask(ch, c.shutdown, SHUTDOWN_OFFSET, SHUTDOWN_MASK)
 
@@ -97,13 +96,34 @@ async def send_feedback():
                     msg = Message(BASE_ID, message)
                     can_bus.send(msg)
                 else:
-                    print(hex(base), message, "SEND CANBUS MESSAGE HERE, CHANGE TIMING TO SUIT")
+                    print(
+                        hex(base),
+                        message,
+                        "SEND CANBUS MESSAGE HERE, CHANGE TIMING TO SUIT",
+                    )
                 base = base + 1
-        await asyncio.sleep(.1)
+        await asyncio.sleep(0.1)
+
+
+async def listenerz():
+    while True:
+        with can_bus.listen() as listener:
+            message_count = listener.in_waiting()
+            for i in range(message_count):
+                msg = listener.receive()
+
+                if msg.id < 0x66E:
+                    process_command(msg.id, msg.data)
+                elif msg.id < 0x67E:
+                    process_config(msg.id, msg.data)
+                print("Message from ", hex(msg.id))
+        await asyncio.sleep(0.1)
+
 
 async def main():
     tasks = []
     tasks.append(asyncio.create_task(send_feedback()))
+    tasks.append(asyncio.create_task(listenerz()))
     for ch in channel:
         tasks.append(asyncio.create_task(ch.process()))
     await asyncio.gather(*tasks)
@@ -112,4 +132,5 @@ async def main():
 # Create all channels according to config
 channel = [Channel(**c) for c in config]
 
-asyncio.run(main())
+if sys.implementation.name == "circuitpython":
+    asyncio.run(main())

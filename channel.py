@@ -38,10 +38,11 @@ class Channel:
         self.soft_start = soft_start
         self.retry_delay = retry_delay
         self.pwm_mode = pwm_mode
-        self.input_pin = getattr(board, input_pin)
-        self.output_pin = getattr(board, output_pin)
+        
 
         if sys.implementation.name == "circuitpython":
+            self.input_pin = getattr(board, input_pin)
+            self.output_pin = getattr(board, output_pin)
             self.input_pin = analogio.AnalogIn(self.input_pin)
             self.output_pin = digitalio.DigitalInOut(self.output_pin)
             self.output_pin.direction = digitalio.Direction.OUTPUT
