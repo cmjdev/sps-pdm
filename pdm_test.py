@@ -72,26 +72,41 @@ def process_command(id, msg):  # TODO: CHANGE THIS TO USE MSG.ID FOR PROD.
         channel[to_command + j].set_command(msg[i : i + 2])
         j += 1
 
+    print("1:", channel[0].duty, channel[0].freq,"2", channel[1].duty, channel[1].freq,"3", channel[2].duty, channel[2].freq,"4", channel[3].duty, channel[3].freq)
+
 
 async def send_feedback():
     while True:
+        
         base = BASE_ID
+        shutdown = False
+        current = 0
+
         for i, c in enumerate(channel):
             ch = i % 4
 
+            # TODO: Send total current, battery voltage, any shutdown
+
             # set current
             message[ch] = int(c.current / 50)
-            # print(c.current)
+            current += c.current
+
             # set shutdown
             set_mask(ch, c.shutdown, SHUTDOWN_OFFSET, SHUTDOWN_MASK)
+            shutdown = c.shutdown or shutdown
 
-            # set s1tatus
+            # set status
             set_mask(ch, c.status, STATUS_OFFSET, STATUS_MASK)
 
             # set active
             set_mask(ch, c.active, ACTIVE_OFFSET, ACTIVE_MASK)
 
+
+
             if ch == 3:
+                message[7] = message[7] or shutdown
+                message[6] = min(int(current/100), 255)
+
                 if sys.implementation.name == "circuitpython":
                     msg = Message(BASE_ID, message)
                     can_bus.send(msg)
@@ -102,7 +117,7 @@ async def send_feedback():
                         "SEND CANBUS MESSAGE HERE, CHANGE TIMING TO SUIT",
                     )
                 base = base + 1
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(0.05)
 
 
 async def listenerz():
