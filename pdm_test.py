@@ -64,7 +64,7 @@ def process_config(id, msg):
     print(channel[0].fuse_max)
 
 
-def process_command(id, msg):  # TODO: CHANGE THIS TO USE MSG.ID FOR PROD.
+def process_command(id, msg):
     to_command = id - BASE_ID - 4
 
     j = 0
@@ -85,7 +85,7 @@ async def send_feedback():
         for i, c in enumerate(channel):
             ch = i % 4
 
-            # TODO: Send total current, battery voltage, any shutdown
+            # TODO: Send battery voltage
 
             # set current
             message[ch] = int(c.current / 50)
@@ -127,6 +127,7 @@ async def listenerz():
             for i in range(message_count):
                 msg = listener.receive()
 
+                # TODO: Make ids an offset from base for flexibility
                 if msg.id < 0x66E:
                     process_command(msg.id, msg.data)
                 elif msg.id < 0x67E:

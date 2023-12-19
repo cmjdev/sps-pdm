@@ -55,15 +55,21 @@ class Channel:
                 
                 self.current = self.input_pin.value / 5.46
 
+                # TODO: Figure out all of the logic for status/states
+                # TODO: Add fuse delay logic
+    
                 # SHUTDOWN IF OVER CURRENT
                 if self.current > self.fuse_max:
                     self.shutdown = True
+                    self.status = 3
 
 
                 if self.shutdown or not self.duty:
                     self.output_pin.value = False
                 elif self.duty:
                     self.output_pin.value = True
+                    self.active = True
+                    self.status = True
                 
                 await asyncio.sleep(0.1)
 
