@@ -7,6 +7,13 @@ if sys.implementation.name == "circuitpython":
     import digitalio
     import board
 
+# DEFINES
+
+STATUS_OFF = 0
+STATUS_ACTIVE = 1
+STATUS_UNDERLOAD = 2
+STATUS_OVERLOAD = 3
+
 class Channel:
     def __init__(
         self,
@@ -57,21 +64,23 @@ class Channel:
 
                 # TODO: Figure out all of the logic for status/states
                 # TODO: Add fuse delay logic
-    
-                # SHUTDOWN IF OVER CURRENT
-                if self.current > self.fuse_max:
-                    self.shutdown = True
-                    self.status = 3
 
-
-                if self.shutdown or not self.duty:
-                    self.output_pin.value = False
-                elif self.duty:
-                    self.output_pin.value = True
-                    self.active = True
-                    self.status = True
                 
-                await asyncio.sleep(0.1)
+                if self.duty and not self.shutdown:
+                    self.output_pin.value = True
+                    self.status = STATUS_ACTIVE
+                elif not self.duty and not self.shutdown:
+                    self.output_pin.value = False
+                    self.status = STATUS_OFF
+
+                if self.current > self.fuse_max:
+                    self.status = STATUS_OVERLOAD
+                elif self.current < self.fuse_min:
+                    self.status = STATUS_UNDERLOAD
+
+                
+                
+                await asyncio.sleep_ms(10)
 
             else: 
                 print("Process Inputs Here")
