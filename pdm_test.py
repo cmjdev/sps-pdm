@@ -72,9 +72,7 @@ def process_command(id, msg):
         channel[to_command + j].set_command(msg[i : i + 2])
         j += 1
 
-    print("1:", channel[0].duty, channel[0].freq,"2", channel[1].duty, channel[1].freq,"3", channel[2].duty, channel[2].freq,"4", channel[3].duty, channel[3].freq)
-
-
+    print(".")
 async def send_feedback():
     while True:
         
@@ -117,7 +115,7 @@ async def send_feedback():
                         "SEND CANBUS MESSAGE HERE, CHANGE TIMING TO SUIT",
                     )
                 base = base + 1
-        await asyncio.sleep(0.05)
+        await asyncio.sleep_ms(100)
 
 
 async def listenerz():
@@ -132,7 +130,7 @@ async def listenerz():
                     process_command(msg.id, msg.data)
                 elif msg.id < 0x67E:
                     process_config(msg.id, msg.data)
-                print("Message from ", hex(msg.id))
+                    print("Message from ", hex(msg.id))
         await asyncio.sleep(0.1)
 
 

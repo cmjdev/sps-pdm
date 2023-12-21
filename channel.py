@@ -3,6 +3,7 @@ import sys
 
 if sys.implementation.name == "circuitpython":
     import microcontroller
+    import supervisor
     import analogio
     import digitalio
     import board
@@ -45,6 +46,10 @@ class Channel:
         self.soft_start = soft_start
         self.retry_delay = retry_delay
         self.pwm_mode = pwm_mode
+
+        # Internal
+        self.fuse_active = False
+        self.fuse_timer = 0
         
 
         if sys.implementation.name == "circuitpython":
@@ -65,22 +70,34 @@ class Channel:
                 # TODO: Figure out all of the logic for status/states
                 # TODO: Add fuse delay logic
 
-                
-                if self.duty and not self.shutdown:
-                    self.output_pin.value = True
-                    self.status = STATUS_ACTIVE
-                elif not self.duty and not self.shutdown:
-                    self.output_pin.value = False
-                    self.status = STATUS_OFF
+                if self.shutdown:
+                    self.output_pin = False
+                else:
+                    if self.duty:
+                        self.output_pin.value = True
+                        self.status = STATUS_ACTIVE
+                    else:
+                        self.output_pin.value = False
+                        self.status = STATUS_OFF
 
-                if self.current > self.fuse_max:
-                    self.status = STATUS_OVERLOAD
-                elif self.current < self.fuse_min:
-                    self.status = STATUS_UNDERLOAD
+                    if self.current > self.fuse_max:
+                        self.status = STATUS_OVERLOAD
+                    elif self.current < self.fuse_min:
+                        self.status = STATUS_UNDERLOAD
 
-                
-                
-                await asyncio.sleep_ms(10)
+                    if self.status > STATUS_ACTIVE:
+                        if self.fuse_active:
+                            self.shutdown = (supervisor.ticks_ms() - self.fuse_timer) > self.fuse_delay
+                            if self.shutdown:
+                                print("shutdown at ", supervisor.ticks_ms())
+                        else: 
+                            self.fuse_timer = supervisor.ticks_ms()
+                            self.fuse_active = True
+                            print("timer started at", self.fuse_timer)
+                    else:
+                        self.fuse_active = False
+                            
+                await asyncio.sleep_ms(100)
 
             else: 
                 print("Process Inputs Here")
@@ -100,3 +117,4 @@ class Channel:
         self.soft_start = msg[4] * 20  # 255 * 20 -> 5100ms
         self.retry_delay = msg[5] * 20  # 255 * 20 -> 5100ms
         self.pwm_mode = (msg[6] & 192) >> 6  # 192 is mask for pwm_mode
+        
