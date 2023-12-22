@@ -67,8 +67,8 @@ class Channel:
                 
                 self.current = self.input_pin.value / 5.46
 
-                # TODO: Figure out all of the logic for status/states
-                # TODO: Add fuse delay logic
+                # TODO: Add PWM / threshold logic
+                # TODO: Add soft-start logic
 
                 if self.shutdown:
                     self.output_pin = False
@@ -97,7 +97,7 @@ class Channel:
                     else:
                         self.fuse_active = False
                             
-                await asyncio.sleep_ms(100)
+                await asyncio.sleep_ms(10)
 
             else: 
                 print("Process Inputs Here")

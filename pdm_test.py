@@ -115,7 +115,7 @@ async def send_feedback():
                         "SEND CANBUS MESSAGE HERE, CHANGE TIMING TO SUIT",
                     )
                 base = base + 1
-        await asyncio.sleep_ms(100)
+        await asyncio.sleep_ms(50)
 
 
 async def listenerz():
@@ -131,7 +131,7 @@ async def listenerz():
                 elif msg.id < 0x67E:
                     process_config(msg.id, msg.data)
                     print("Message from ", hex(msg.id))
-        await asyncio.sleep(0.1)
+        await asyncio.sleep_ms(20)
 
 
 async def main():
