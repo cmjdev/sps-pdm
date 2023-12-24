@@ -60,10 +60,6 @@ def process_config(id, msg):
 
     channel[to_command].set_config(msg)
 
-    print(f"set channel {to_command} to {msg}")
-    print(channel[0].fuse_max)
-
-
 def process_command(id, msg):
     to_command = id - BASE_ID - 4
 
@@ -72,7 +68,6 @@ def process_command(id, msg):
         channel[to_command + j].set_command(msg[i : i + 2])
         j += 1
 
-    print(".")
 async def send_feedback():
     while True:
         
@@ -109,11 +104,7 @@ async def send_feedback():
                     msg = Message(BASE_ID, message)
                     can_bus.send(msg)
                 else:
-                    print(
-                        hex(base),
-                        message,
-                        "SEND CANBUS MESSAGE HERE, CHANGE TIMING TO SUIT",
-                    )
+                    pass
                 base = base + 1
         await asyncio.sleep_ms(50)
 
@@ -130,7 +121,6 @@ async def listenerz():
                     process_command(msg.id, msg.data)
                 elif msg.id < 0x67E:
                     process_config(msg.id, msg.data)
-                    print("Message from ", hex(msg.id))
         await asyncio.sleep_ms(20)
 
 

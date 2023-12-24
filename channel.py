@@ -88,19 +88,15 @@ class Channel:
                     if self.status > STATUS_ACTIVE:
                         if self.fuse_active:
                             self.shutdown = (supervisor.ticks_ms() - self.fuse_timer) > self.fuse_delay
-                            if self.shutdown:
-                                print("shutdown at ", supervisor.ticks_ms())
                         else: 
                             self.fuse_timer = supervisor.ticks_ms()
                             self.fuse_active = True
-                            print("timer started at", self.fuse_timer)
                     else:
                         self.fuse_active = False
                             
                 await asyncio.sleep_ms(10)
 
-            else: 
-                print("Process Inputs Here")
+            else:
                 await asyncio.sleep(1)
 
     def set_command(self, msg): # takes byte with combined duty/frequency/reset
