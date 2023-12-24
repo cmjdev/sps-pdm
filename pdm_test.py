@@ -61,6 +61,7 @@ def process_config(id, msg):
     channel[to_command].set_config(msg)
 
 def process_command(id, msg):
+    # TODO: Add reset functionality into command message
     to_command = id - BASE_ID - 4
 
     j = 0
@@ -106,7 +107,7 @@ async def send_feedback():
                 else:
                     pass
                 base = base + 1
-        await asyncio.sleep_ms(50)
+        await asyncio.sleep_ms(43)
 
 
 async def listenerz():
